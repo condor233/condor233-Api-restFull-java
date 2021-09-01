@@ -33,26 +33,26 @@ public class CategoriaController {
 	@Autowired
 	private CategoriaService categoriaService;
 	
-	@ApiOperation(value = "findAll")
+	@ApiOperation(value = "findAll", nickname = "findAll")
 	@GetMapping
 	public List<Categoria> findAll(){
 		return categoriaService.findAll();
 	}
 	
-	@ApiOperation(value = "findById")
+	@ApiOperation(value = "findById", nickname = "findById")
 	@GetMapping("/{id}")
 	public ResponseEntity<Optional<Categoria>> findById(@PathVariable Long id) {
 		Optional<Categoria> categoria = categoriaService.findById(id);
 		return categoria.isPresent() ? ResponseEntity.ok(categoria) : ResponseEntity.notFound().build();
 	}
 	
-	@ApiOperation(value = "Save")
+	@ApiOperation(value = "Save", nickname = "save")
 	@PostMapping
 	public ResponseEntity<Categoria> save(@Valid @RequestBody Categoria categoria) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(categoriaService.save(categoria));
 	}
 	
-	@ApiOperation(value = "Update")
+	@ApiOperation(value = "Update", nickname = "update")
 	@PutMapping("/{id}")
 	public ResponseEntity<Categoria> update(@PathVariable long id, @Valid @RequestBody Categoria categoria){
 		return ResponseEntity.ok(categoriaService.update(id, categoria));

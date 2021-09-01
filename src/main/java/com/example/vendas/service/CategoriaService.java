@@ -12,7 +12,7 @@ import com.example.vendas.entity.Categoria;
 import com.example.vendas.exception.BusinessRuleException;
 import com.example.vendas.repository.CategoriaRepository;
 
-import ch.qos.logback.core.joran.util.beans.BeanUtil;
+
 
 @Service
 public class CategoriaService {
