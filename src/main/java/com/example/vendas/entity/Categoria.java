@@ -20,13 +20,21 @@ public class Categoria {
 
 	@Column(name = "nome")
 	private String nome;
+	
+	public Categoria() {
+	}
 
 	public Categoria(String nome) {
 		this.nome = nome;
 	}
+	
+	
 
-	public Categoria() {
+	public Categoria(Long codigo, String nome) {
+		this.codigo = codigo;
+		this.nome = nome;
 	}
+
 
 	public Long getCodigo() {
 		return codigo;
