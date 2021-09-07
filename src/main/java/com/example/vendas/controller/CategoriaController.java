@@ -19,7 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.vendas.dto.CategoriaDTO;
+import com.example.vendas.dto.CategoriaResponseDTO;
+import com.example.vendas.dto.CategoriaRequestDTO;
 import com.example.vendas.entity.Categoria;
 import com.example.vendas.service.CategoriaService;
 
@@ -36,24 +37,25 @@ public class CategoriaController {
 
 	@ApiOperation(value = "findAll", nickname = "findAll")
 	@GetMapping
-	public List<CategoriaDTO> findAll() {
+	public List<CategoriaResponseDTO> findAll() {
 		return categoriaService.findAll().stream()
-				.map(categoria -> CategoriaDTO.convertToCategotiaDTO(categoria))
-				.collect(Collectors.toList());
+				.map(categoria -> CategoriaResponseDTO.convertToCategotiaDTO(categoria)).collect(Collectors.toList());
 
 	}
 
 	@ApiOperation(value = "findById", nickname = "findById")
 	@GetMapping("/{id}")
-	public ResponseEntity<CategoriaDTO> findById(@PathVariable Long id) {
+	public ResponseEntity<CategoriaResponseDTO> findById(@PathVariable Long id) {
 		Optional<Categoria> categoria = categoriaService.findById(id);
-		return categoria.isPresent() ? ResponseEntity.ok(CategoriaDTO.convertToCategotiaDTO(categoria.get())) : ResponseEntity.notFound().build();
+		return categoria.isPresent() ? ResponseEntity.ok(CategoriaResponseDTO.convertToCategotiaDTO(categoria.get()))
+				: ResponseEntity.notFound().build();
 	}
 
 	@ApiOperation(value = "Save", nickname = "save")
 	@PostMapping
-	public ResponseEntity<Categoria> save(@Valid @RequestBody Categoria categoria) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(categoriaService.save(categoria));
+	public ResponseEntity<CategoriaResponseDTO> save(@Valid @RequestBody CategoriaRequestDTO categoriaDto) {
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(CategoriaResponseDTO.convertToCategotiaDTO(categoriaService.save(categoriaDto.covertToEntity())));
 	}
 
 	@ApiOperation(value = "Update", nickname = "update")

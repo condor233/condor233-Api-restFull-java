@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel("Categoria DTO")
-public class CategoriaDTO {
+public class CategoriaResponseDTO {
 
 	@ApiModelProperty(value = "Código")
 	private Long codigo;
@@ -14,13 +14,13 @@ public class CategoriaDTO {
 	@ApiModelProperty(value = "Nome")
 	private String nome;
 	
-	public CategoriaDTO(Long codigo, String nome) {
+	public CategoriaResponseDTO(Long codigo, String nome) {
 		this.codigo = codigo;
 		this.nome = nome;
 	}
 	
-	public static CategoriaDTO convertToCategotiaDTO(Categoria categoria) {
-		return new CategoriaDTO(categoria.getCodigo(), categoria.getNome());
+	public static CategoriaResponseDTO convertToCategotiaDTO(Categoria categoria) {
+		return new CategoriaResponseDTO(categoria.getCodigo(), categoria.getNome());
 	}
 
 	public Long getCodigo() {
