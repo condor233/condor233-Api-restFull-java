@@ -2,6 +2,7 @@ package com.example.vendas.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.vendas.dto.produto.ProdutoRequestDTO;
+import com.example.vendas.dto.produto.ProdutoResponseDTO;
 import com.example.vendas.entity.Produto;
 import com.example.vendas.service.ProdutoService;
 
@@ -28,36 +31,38 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @RequestMapping("/categoria{idCategoria}/produto")
 public class ProdutoController {
-	
+
 	@Autowired
 	private ProdutoService produtoService;
-	
+
 	@ApiOperation(value = "Listar", nickname = "findAllProduct")
 	@GetMapping
-	public List<Produto> findAll(@PathVariable Long idCategoria) {
-		return produtoService.findAll(idCategoria);
+	public List<ProdutoResponseDTO> findAll(@PathVariable Long idCategoria) {
+		return produtoService.findAll(idCategoria).stream()
+				.map(produto -> ProdutoResponseDTO.convertToProductDTO(produto)).collect(Collectors.toList());
 	}
-	
+
 	@ApiOperation(value = "Listar por código", nickname = "findByIdProduct")
 	@GetMapping("/{id}")
-	public ResponseEntity<Optional<Produto>> findById(@PathVariable Long idCategoria,
-			@PathVariable Long id){
+	public ResponseEntity<ProdutoResponseDTO> findById(@PathVariable Long idCategoria, @PathVariable Long id) {
 		Optional<Produto> produto = produtoService.findById(id, idCategoria);
-		return produto.isPresent() ? ResponseEntity.ok(produto) : ResponseEntity.notFound().build();
+		return produto.isPresent() ? ResponseEntity.ok(ProdutoResponseDTO.convertToProductDTO(produto.get())) : ResponseEntity.notFound().build();
 	}
-	
+
 	@ApiOperation(value = "Save", nickname = "saveProduct")
 	@PostMapping
-	public ResponseEntity<Produto> save(@PathVariable Long idCategoria, @Valid @RequestBody Produto produto){
-		return ResponseEntity.status(HttpStatus.CREATED).body(produtoService.save(idCategoria, produto));
+	public ResponseEntity<ProdutoResponseDTO> save(@PathVariable Long idCategoria, @Valid @RequestBody ProdutoRequestDTO produto) {
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(ProdutoResponseDTO.convertToProductDTO(produtoService.save(idCategoria, produto.convertToEntity(idCategoria))));
 	}
-	
+
 	@ApiOperation(value = "Update", nickname = "updateProduct")
 	@PutMapping("/{idProduto}")
-	public ResponseEntity<Produto> update(@PathVariable Long idCategoria, @PathVariable Long idProduto, @Valid @RequestBody Produto produto){
+	public ResponseEntity<Produto> update(@PathVariable Long idCategoria, @PathVariable Long idProduto,
+			@Valid @RequestBody Produto produto) {
 		return ResponseEntity.ok(produtoService.update(idCategoria, idProduto, produto));
 	}
-	
+
 	@ApiOperation(value = "Delete", nickname = "deleteProduct")
 	@DeleteMapping("/{idProduto}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)

@@ -1,4 +1,4 @@
-package com.example.vendas.dto;
+package com.example.vendas.dto.categoria;
 
 import javax.validation.constraints.NotBlank;
 

@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.vendas.dto.CategoriaResponseDTO;
-import com.example.vendas.dto.CategoriaRequestDTO;
+import com.example.vendas.dto.categoria.CategoriaRequestDTO;
+import com.example.vendas.dto.categoria.CategoriaResponseDTO;
 import com.example.vendas.entity.Categoria;
 import com.example.vendas.service.CategoriaService;
 
