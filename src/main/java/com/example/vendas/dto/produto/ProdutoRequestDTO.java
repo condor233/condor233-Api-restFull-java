@@ -40,6 +40,10 @@ public class ProdutoRequestDTO {
 	public Produto convertToEntity(Long idCategoria) {
 		return new Produto(descricao, quantidade, precoCusto, precoVenda, observacao, new Categoria(idCategoria));
 	}
+	
+	public Produto convertToEntity(Long idCategoria, Long codigoProduto) {
+		return new Produto(codigoProduto, descricao, quantidade, precoCusto, precoVenda, observacao, new Categoria(idCategoria));
+	}
 
 	public String getDescricao() {
 		return descricao;

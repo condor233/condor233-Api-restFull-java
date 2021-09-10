@@ -46,21 +46,23 @@ public class ProdutoController {
 	@GetMapping("/{id}")
 	public ResponseEntity<ProdutoResponseDTO> findById(@PathVariable Long idCategoria, @PathVariable Long id) {
 		Optional<Produto> produto = produtoService.findById(id, idCategoria);
-		return produto.isPresent() ? ResponseEntity.ok(ProdutoResponseDTO.convertToProductDTO(produto.get())) : ResponseEntity.notFound().build();
+		return produto.isPresent() ? ResponseEntity.ok(ProdutoResponseDTO.convertToProductDTO(produto
+				.get())) : ResponseEntity.notFound().build();
 	}
 
 	@ApiOperation(value = "Save", nickname = "saveProduct")
 	@PostMapping
 	public ResponseEntity<ProdutoResponseDTO> save(@PathVariable Long idCategoria, @Valid @RequestBody ProdutoRequestDTO produto) {
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(ProdutoResponseDTO.convertToProductDTO(produtoService.save(idCategoria, produto.convertToEntity(idCategoria))));
+				.body(ProdutoResponseDTO.convertToProductDTO(produtoService
+						.save(idCategoria, produto.convertToEntity(idCategoria))));
 	}
 
 	@ApiOperation(value = "Update", nickname = "updateProduct")
 	@PutMapping("/{idProduto}")
-	public ResponseEntity<Produto> update(@PathVariable Long idCategoria, @PathVariable Long idProduto,
-			@Valid @RequestBody Produto produto) {
-		return ResponseEntity.ok(produtoService.update(idCategoria, idProduto, produto));
+	public ResponseEntity<ProdutoResponseDTO> update(@PathVariable Long idCategoria, @PathVariable Long idProduto,
+			@Valid @RequestBody ProdutoRequestDTO produto) {
+		return ResponseEntity.ok(ProdutoResponseDTO.convertToProductDTO(produtoService.update(idCategoria, idProduto, produto.convertToEntity(idCategoria, idProduto))));
 	}
 
 	@ApiOperation(value = "Delete", nickname = "deleteProduct")
