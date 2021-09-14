@@ -35,7 +35,7 @@ public class CategoriaController {
 	@Autowired
 	private CategoriaService categoriaService;
 
-	@ApiOperation(value = "findAll", nickname = "findAll")
+	@ApiOperation(value = "findAll", nickname = "findAllCategorias")
 	@GetMapping
 	public List<CategoriaResponseDTO> findAll() {
 		return categoriaService.findAll().stream()
@@ -43,7 +43,7 @@ public class CategoriaController {
 
 	}
 
-	@ApiOperation(value = "findById", nickname = "findById")
+	@ApiOperation(value = "findById", nickname = "findByIdCategoria")
 	@GetMapping("/{id}")
 	public ResponseEntity<CategoriaResponseDTO> findById(@PathVariable Long id) {
 		Optional<Categoria> categoria = categoriaService.findById(id);
@@ -51,14 +51,14 @@ public class CategoriaController {
 				: ResponseEntity.notFound().build();
 	}
 
-	@ApiOperation(value = "Save", nickname = "save")
+	@ApiOperation(value = "Save", nickname = "saveCategoria")
 	@PostMapping
 	public ResponseEntity<CategoriaResponseDTO> save(@Valid @RequestBody CategoriaRequestDTO categoriaDto) {
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.body(CategoriaResponseDTO.convertToCategotiaDTO(categoriaService.save(categoriaDto.covertToEntity())));
 	}
 
-	@ApiOperation(value = "Update", nickname = "update")
+	@ApiOperation(value = "Update", nickname = "updateCategoria")
 	@PutMapping("/{id}")
 	public ResponseEntity<CategoriaResponseDTO> update(@PathVariable long id, @Valid @RequestBody CategoriaRequestDTO categoriaDto) {
 		return ResponseEntity.ok(CategoriaResponseDTO.convertToCategotiaDTO(categoriaService.update(id, categoriaDto.covertToEntity(id))));
