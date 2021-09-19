@@ -1,5 +1,6 @@
 package com.example.vendas.service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,7 +20,7 @@ import com.example.vendas.repository.VendaRepositorio;
 
 @Service
 public class VendaService {
-	
+
 	private VendaRepositorio vendaRepositorio;
 	private ItemVendaRepositorio itemVendaRepositorio;
 	private ClienteService clienteServico;
@@ -37,6 +38,20 @@ public class VendaService {
 		List<VendaResponseDTO> vendaResponseDtoList = vendaRepositorio.findByClienteCodigo(codigoCliente).stream()
 				.map(this::criandoVendaResponseDTO).collect(Collectors.toList());
 		return new ClienteVendaResponseDTO(cliente.getNome(), vendaResponseDtoList);
+	}
+
+	public ClienteVendaResponseDTO listaVendaPorCodigo(Long codigoVenda) {
+		Venda venda = validVendaExist(codigoVenda);
+		return new ClienteVendaResponseDTO(venda.getCliente().getNome(), Arrays.asList(criandoVendaResponseDTO(venda)));
+	}
+
+	private Venda validVendaExist(Long codigoVenda) {
+		Optional<Venda> venda = vendaRepositorio.findById(codigoVenda);
+		if (venda.isEmpty()) {
+			throw new BusinessRuleException(String.format("Venda de codigo %s não encontrada", codigoVenda));
+		}
+
+		return venda.get();
 	}
 
 	private Cliente validClienteVendaExist(Long codigoCliente) {
@@ -60,6 +75,5 @@ public class VendaService {
 		return new ItemVendaResponseDTO(itemVenda.getCodigo(), itemVenda.getQuantidade(), itemVenda.getPrecoVendido(),
 				itemVenda.getProduto().getCodigo(), itemVenda.getProduto().getDescricao());
 	}
-
 
 }
