@@ -12,8 +12,6 @@ import com.example.vendas.entity.Cliente;
 import com.example.vendas.exception.BusinessRuleException;
 import com.example.vendas.repository.ClienteRepository;
 
-import net.bytebuddy.implementation.bytecode.Throw;
-
 @Service
 public class ClienteService {
 

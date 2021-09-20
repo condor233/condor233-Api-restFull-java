@@ -38,14 +38,14 @@ public class ProdutoController {
 	@ApiOperation(value = "Listar", nickname = "findAllProduct")
 	@GetMapping
 	public List<ProdutoResponseDTO> findAll(@PathVariable Long idCategoria) {
-		return produtoService.findAll(idCategoria).stream()
+		return produtoService.listarTodos(idCategoria).stream()
 				.map(produto -> ProdutoResponseDTO.convertToProductDTO(produto)).collect(Collectors.toList());
 	}
 
 	@ApiOperation(value = "Listar por código", nickname = "findByIdProduct")
 	@GetMapping("/{id}")
 	public ResponseEntity<ProdutoResponseDTO> findById(@PathVariable Long idCategoria, @PathVariable Long id) {
-		Optional<Produto> produto = produtoService.findById(id, idCategoria);
+		Optional<Produto> produto = produtoService.buscarPorCodigo(id, idCategoria);
 		return produto.isPresent() ? ResponseEntity.ok(ProdutoResponseDTO.convertToProductDTO(produto
 				.get())) : ResponseEntity.notFound().build();
 	}
@@ -55,21 +55,21 @@ public class ProdutoController {
 	public ResponseEntity<ProdutoResponseDTO> save(@PathVariable Long idCategoria, @Valid @RequestBody ProdutoRequestDTO produto) {
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.body(ProdutoResponseDTO.convertToProductDTO(produtoService
-						.save(idCategoria, produto.convertToEntity(idCategoria))));
+						.salvar(idCategoria, produto.convertToEntity(idCategoria))));
 	}
 
 	@ApiOperation(value = "Update", nickname = "updateProduct")
 	@PutMapping("/{idProduto}")
 	public ResponseEntity<ProdutoResponseDTO> update(@PathVariable Long idCategoria, @PathVariable Long idProduto,
 			@Valid @RequestBody ProdutoRequestDTO produto) {
-		return ResponseEntity.ok(ProdutoResponseDTO.convertToProductDTO(produtoService.update(idCategoria, idProduto, produto.convertToEntity(idCategoria, idProduto))));
+		return ResponseEntity.ok(ProdutoResponseDTO.convertToProductDTO(produtoService.atualizar(idCategoria, idProduto, produto.convertToEntity(idCategoria, idProduto))));
 	}
 
 	@ApiOperation(value = "Delete", nickname = "deleteProduct")
 	@DeleteMapping("/{idProduto}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void deletar(@PathVariable Long idCategoria, @PathVariable Long idProduto) {
-		produtoService.delete(idCategoria, idProduto);
+		produtoService.deletar(idCategoria, idProduto);
 	}
 
 }

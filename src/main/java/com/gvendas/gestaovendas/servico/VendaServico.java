@@ -1,45 +1,40 @@
-package com.example.vendas.service;
+package com.gvendas.gestaovendas.servico;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.example.vendas.dto.venda.ClienteVendaResponseDTO;
-import com.example.vendas.dto.venda.ItemVendaRequestDTO;
-import com.example.vendas.dto.venda.VendaRequestDTO;
-import com.example.vendas.dto.venda.VendaResponseDTO;
-import com.example.vendas.entity.Cliente;
-import com.example.vendas.entity.ItemVenda;
-import com.example.vendas.entity.Produto;
-import com.example.vendas.entity.Venda;
-import com.example.vendas.exception.BusinessRuleException;
-import com.example.vendas.repository.ItemVendaRepositorio;
-import com.example.vendas.repository.VendaRepositorio;
-
-import io.jaegertracing.Configuration.Propagation;
+import com.gvendas.gestaovendas.dto.venda.ClienteVendaResponseDTO;
+import com.gvendas.gestaovendas.dto.venda.ItemVendaRequestDTO;
+import com.gvendas.gestaovendas.dto.venda.VendaRequestDTO;
+import com.gvendas.gestaovendas.dto.venda.VendaResponseDTO;
+import com.gvendas.gestaovendas.entidades.Cliente;
+import com.gvendas.gestaovendas.entidades.ItemVenda;
+import com.gvendas.gestaovendas.entidades.Produto;
+import com.gvendas.gestaovendas.entidades.Venda;
+import com.gvendas.gestaovendas.excecao.RegraNegocioException;
+import com.gvendas.gestaovendas.repositorio.ItemVendaRepositorio;
+import com.gvendas.gestaovendas.repositorio.VendaRepositorio;
 
 @Service
-public class VendaService extends AbstractVendaService {
+public class VendaServico extends AbstractVendaServico {
 
 	private VendaRepositorio vendaRepositorio;
 	private ItemVendaRepositorio itemVendaRepositorio;
-	private ClienteService clienteServico;
-	private ProdutoService produtoServico;
+	private ClienteServico clienteServico;
+	private ProdutoServico produtoServico;
 
-
-	
 	@Autowired
-	public VendaService(VendaRepositorio vendaRepositorio, ItemVendaRepositorio itemVendaRepositorio,
-			ClienteService clienteServico, ProdutoService produtoServico) {
+	public VendaServico(VendaRepositorio vendaRepositorio, ClienteServico clienteServico,
+			ItemVendaRepositorio itemVendaRepositorio, ProdutoServico produtoServico) {
 		this.vendaRepositorio = vendaRepositorio;
-		this.itemVendaRepositorio = itemVendaRepositorio;
 		this.clienteServico = clienteServico;
+		this.itemVendaRepositorio = itemVendaRepositorio;
 		this.produtoServico = produtoServico;
 	}
 
@@ -57,6 +52,7 @@ public class VendaService extends AbstractVendaService {
 		return retornandoClienteVendaResponseDTO(venda, itensVendaList);
 	}
 
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false, rollbackFor = Exception.class)
 	public ClienteVendaResponseDTO salvar(Long codigoCliente, VendaRequestDTO vendaDto) {
 		Cliente cliente = validarClienteVendaExiste(codigoCliente);
 		validarProdutoExisteEAtualizarQuantidade(vendaDto.getItensVendaDto());
@@ -75,6 +71,7 @@ public class VendaService extends AbstractVendaService {
 		return retornandoClienteVendaResponseDTO(vendaAtualizada, itemVendaRepositorio.findByVendaPorCodigo(vendaAtualizada.getCodigo()));
 	}
 
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false, rollbackFor = Exception.class)
 	public void deletar(Long codigoVenda) {
 		validarVendaExiste(codigoVenda);
 		List<ItemVenda> itensVenda = itemVendaRepositorio.findByVendaPorCodigo(codigoVenda);
@@ -116,7 +113,7 @@ public class VendaService extends AbstractVendaService {
 
 	private void validarQuantidadeProdutoExiste(Produto produto, Integer qtdeVendaDto) {
 		if(!(produto.getQuantidade() >= qtdeVendaDto)) {
-			throw new BusinessRuleException(String.format("A quantidade %s informada para o produto %s não está disponível em estoque", 
+			throw new RegraNegocioException(String.format("A quantidade %s informada para o produto %s não está disponível em estoque", 
 					qtdeVendaDto, produto.getDescricao()));
 		}
 	}
@@ -124,15 +121,15 @@ public class VendaService extends AbstractVendaService {
 	private Venda validarVendaExiste(Long codigoVenda) {
 		Optional<Venda> venda = vendaRepositorio.findById(codigoVenda);
 		if (venda.isEmpty()) {
-			throw new BusinessRuleException(String.format("Venda de código %s não encontrada.", codigoVenda));
+			throw new RegraNegocioException(String.format("Venda de código %s não encontrada.", codigoVenda));
 		}
 		return venda.get();
 	}
 
 	private Cliente validarClienteVendaExiste(Long codigoCliente) {
-		Optional<Cliente> cliente = clienteServico.findById(codigoCliente);
+		Optional<Cliente> cliente = clienteServico.buscarPorCodigo(codigoCliente);
 		if (cliente.isEmpty()) {
-			throw new BusinessRuleException(
+			throw new RegraNegocioException(
 					String.format("O Cliente de código %s informado não existe no cadastro.", codigoCliente));
 		}
 		return cliente.get();

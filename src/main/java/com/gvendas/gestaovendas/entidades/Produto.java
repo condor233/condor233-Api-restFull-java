@@ -1,4 +1,4 @@
-package com.example.vendas.entity;
+package com.gvendas.gestaovendas.entidades;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -39,15 +39,15 @@ public class Produto {
 	@ManyToOne
 	@JoinColumn(name = "codigo_categoria", referencedColumnName = "codigo")
 	private Categoria categoria;
-	
+
 	public Produto() {
+
 	}
-	
+
 	public Produto(Long codigo) {
 		this.codigo = codigo;
 	}
 
-	
 	public Produto(Long codigo, String descricao, Integer quantidade, BigDecimal precoCusto, BigDecimal precoVenda,
 			String observacao, Categoria categoria) {
 		this.codigo = codigo;
@@ -58,7 +58,6 @@ public class Produto {
 		this.observacao = observacao;
 		this.categoria = categoria;
 	}
-	
 
 	public Produto(String descricao, Integer quantidade, BigDecimal precoCusto, BigDecimal precoVenda,
 			String observacao, Categoria categoria) {

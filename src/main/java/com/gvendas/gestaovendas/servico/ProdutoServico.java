@@ -1,4 +1,4 @@
-package com.example.vendas.service;
+package com.gvendas.gestaovendas.servico;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,31 +8,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import com.example.vendas.entity.Produto;
-import com.example.vendas.exception.BusinessRuleException;
-import com.example.vendas.repository.ProdutoRepository;
+import com.gvendas.gestaovendas.entidades.Produto;
+import com.gvendas.gestaovendas.excecao.RegraNegocioException;
+import com.gvendas.gestaovendas.repositorio.ProdutoRepositorio;
 
 @Service
-public class ProdutoService {
+public class ProdutoServico {
 	
 	@Autowired
-	private ProdutoRepository produtoRepository;
+	private ProdutoRepositorio produtoRepositorio;
 	
 	@Autowired
-	private CategoriaService categoriaService;
+	private CategoriaServico categoriaServico;
 		
 	public List<Produto> listarTodos(Long codigoCategoria) {
-		return produtoRepository.findByCategoriaCodigo(codigoCategoria);
+		return produtoRepositorio.findByCategoriaCodigo(codigoCategoria);
 	}
 	
 	public Optional<Produto> buscarPorCodigo(Long codigo, Long codigoCategoria) {
-		return produtoRepository.findById(codigo, codigoCategoria);
+		return produtoRepositorio.buscarPorCodigo(codigo, codigoCategoria);
 	}
 	
 	public Produto salvar(Long codigoCategoria, Produto produto) {
 		validarCategoriaDoProdutoExiste(codigoCategoria);
 		validarProdutoDuplicado(produto);
-		return produtoRepository.save(produto);
+		return produtoRepositorio.save(produto);
 	}
 	
 	public Produto atualizar(Long codigoCategoria, Long codigoProduto, Produto produto) {
@@ -40,22 +40,22 @@ public class ProdutoService {
 		validarCategoriaDoProdutoExiste(codigoCategoria);
 		validarProdutoDuplicado(produto);
 		BeanUtils.copyProperties(produto, produtoSalvar, "codigo");
-		return produtoRepository.save(produtoSalvar);
+		return produtoRepositorio.save(produtoSalvar);
 	}
 	
 	public void deletar(Long codigoCategoria, Long codigoProduto) {
 		Produto produto = validarProdutoExiste(codigoProduto, codigoCategoria);
-		produtoRepository.delete(produto);
+		produtoRepositorio.delete(produto);
 	}
 	
 	protected void atualizarQuantidadeEmEstoque(Produto produto) {
-		produtoRepository.save(produto);
+		produtoRepositorio.save(produto);
 	}
 
 	protected Produto validarProdutoExiste(Long codigoProduto) {
-		Optional<Produto> produto = produtoRepository.findById(codigoProduto);
+		Optional<Produto> produto = produtoRepositorio.findById(codigoProduto);
 		if(produto.isEmpty()) {
-			throw new BusinessRuleException(String.format("Produto de código %s não encontrado", codigoProduto));
+			throw new RegraNegocioException(String.format("Produto de código %s não encontrado", codigoProduto));
 		}
 		return produto.get();
 	}
@@ -70,19 +70,19 @@ public class ProdutoService {
 
 
 	private void validarProdutoDuplicado(Produto produto) {
-		Optional<Produto> produtoPorDescricao = produtoRepository.findByCategoriaCodigoAndDescricao(produto.getCategoria().getCodigo(), produto.getDescricao());
+		Optional<Produto> produtoPorDescricao = produtoRepositorio.findByCategoriaCodigoAndDescricao(produto.getCategoria().getCodigo(), produto.getDescricao());
 		if(produtoPorDescricao.isPresent() && produtoPorDescricao.get().getCodigo() != produto.getCodigo()) {
-			throw new BusinessRuleException(String.format("O produto %s já está cadastrado", produto.getDescricao()));
+			throw new RegraNegocioException(String.format("O produto %s já está cadastrado", produto.getDescricao()));
 		}
 	}
 	
 	private void validarCategoriaDoProdutoExiste(Long codigoCategoria) {
 		if(codigoCategoria == null) {
-			throw new BusinessRuleException("A categoria não pode ser nula");
+			throw new RegraNegocioException("A categoria não pode ser nula");
 		}
 		
-		if(categoriaService.findById(codigoCategoria).isEmpty()) {
-			throw new BusinessRuleException(String.format("A categoria de código %s informada não existe no cadastro", codigoCategoria));
+		if(categoriaServico.buscarPorCodigo(codigoCategoria).isEmpty()) {
+			throw new RegraNegocioException(String.format("A categoria de código %s informada não existe no cadastro", codigoCategoria));
 		}
 	}
 }
